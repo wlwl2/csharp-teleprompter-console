@@ -7,6 +7,10 @@ namespace TeleprompterConsole
 {
     class Program
     {
+        // In a console application’s Main method, you cannot use the await
+        // operator.
+        // If you use C# 7.1 or later, you can create console applications
+        // with async Main method.
         static void Main(string[] args)
         {
             var lines = ReadFrom("sampleQuotes.txt");
@@ -22,7 +26,25 @@ namespace TeleprompterConsole
                     pause.Wait();
                 }
             }
+            ShowTeleprompter().Wait();
 
+        }
+
+        private static async Task ShowTeleprompter()
+        {
+            var words = ReadFrom("sampleQuotes.txt");
+            foreach (var word in words)
+            {
+                Console.Write(word);
+                if (!string.IsNullOrWhiteSpace(word))
+                {
+                    // You can imagine that this method returns when it
+                    // reaches an await.
+                    // The returned Task indicates that the work has not
+                    // completed.
+                    await Task.Delay(200);
+                }
+            }
         }
 
         // The IEnumerable<T> interface is defined in the
@@ -45,6 +67,9 @@ namespace TeleprompterConsole
                         lineLength += word.Length + 1;
                         if (lineLength > 70)
                         {
+                            // Environment.NewLine returns a string containing
+                            // "\r\n" for non-Unix platforms, or a string
+                            // containing "\n" for Unix platforms.
                             yield return Environment.NewLine;
                             lineLength = 0;
                         }
@@ -52,6 +77,30 @@ namespace TeleprompterConsole
                     yield return Environment.NewLine;
                 }
             }
+        }
+
+        private static async Task GetInput()
+        {
+            var delay = 200;
+
+            // lambda expression to represent an Action delegate that reads a
+            // key from the Console and modifies a local variable representing
+            // the delay when the user presses the ‘<’ or ‘>’ keys.
+            Action work = () =>
+            {
+                do {
+                    var key = Console.ReadKey(true);
+                    if (key.KeyChar == '>')
+                    {
+                        delay -= 10;
+                    }
+                    else if (key.KeyChar == '<')
+                    {
+                        delay += 10;
+                    }
+                } while (true);
+            };
+            await Task.Run(work);
         }
     }
 }
