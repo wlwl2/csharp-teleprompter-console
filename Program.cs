@@ -13,38 +13,36 @@ namespace TeleprompterConsole
         // with async Main method.
         static void Main(string[] args)
         {
-            var lines = ReadFrom("sampleQuotes.txt");
-            foreach (var line in lines)
-            {
-                Console.Write(line);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    var pause = Task.Delay(200);
-                    // Synchronously waiting on a task is an
-                    // anti-pattern. This will get fixed in later
-                    // steps.
-                    pause.Wait();
-                }
-            }
-            ShowTeleprompter().Wait();
+            // var lines = ReadFrom("sampleQuotes.txt");
+            // foreach (var line in lines)
+            // {
+            //     Console.Write(line);
+            //     if (!string.IsNullOrWhiteSpace(line))
+            //     {
+            //         var pause = Task.Delay(200);
+            //         // Synchronously waiting on a task is an
+            //         // anti-pattern. This will get fixed in later
+            //         // steps.
+            //         pause.Wait();
+            //     }
+            // }
+            RunTeleprompter().Wait();
 
         }
 
-        private static async Task ShowTeleprompter()
+        private static async Task ShowTeleprompter(TelePrompterConfig config)
         {
             var words = ReadFrom("sampleQuotes.txt");
-            foreach (var word in words)
+            foreach (var line in words)
             {
-                Console.Write(word);
-                if (!string.IsNullOrWhiteSpace(word))
+                // Console.Write(config.DelayInMilliseconds);
+                Console.Write(line);
+                if (!string.IsNullOrWhiteSpace(line))
                 {
-                    // You can imagine that this method returns when it
-                    // reaches an await.
-                    // The returned Task indicates that the work has not
-                    // completed.
-                    await Task.Delay(200);
+                    await Task.Delay(config.DelayInMilliseconds);
                 }
             }
+            config.SetDone();
         }
 
         // The IEnumerable<T> interface is defined in the
@@ -79,28 +77,28 @@ namespace TeleprompterConsole
             }
         }
 
-        private static async Task GetInput()
+        private static async Task GetInput(TelePrompterConfig config)
         {
-            var delay = 200;
-
-            // lambda expression to represent an Action delegate that reads a
-            // key from the Console and modifies a local variable representing
-            // the delay when the user presses the ‘<’ or ‘>’ keys.
             Action work = () =>
             {
                 do {
                     var key = Console.ReadKey(true);
                     if (key.KeyChar == '>')
-                    {
-                        delay -= 10;
-                    }
+                        config.UpdateDelay(-10);
                     else if (key.KeyChar == '<')
-                    {
-                        delay += 10;
-                    }
-                } while (true);
+                        config.UpdateDelay(10);
+                } while (!config.Done);
             };
             await Task.Run(work);
+        }
+
+        private static async Task RunTeleprompter()
+        {
+            var config = new TelePrompterConfig();
+            var displayTask = ShowTeleprompter(config);
+
+            var speedTask = GetInput(config);
+            await Task.WhenAny(displayTask, speedTask);
         }
     }
 }
