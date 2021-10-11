@@ -48,9 +48,9 @@ namespace TeleprompterConsole {
                 while ((line = reader.ReadLine()) != null) {
                     string[] words = line.Split(' ');
 
-                    var lineLength = 0;
+                    int lineLength = 0;
                     // return single words instead of entire lines
-                    foreach (var word in words) {
+                    foreach (string word in words) {
                         yield return word + " ";
                         lineLength += word.Length + 1;
                         if (lineLength > 70) {
