@@ -2,6 +2,7 @@
 // `using` imports all classes from a namespace.
 using static System.Math;
 
+// C# uses namespaces to organize types
 namespace TeleprompterConsole
 {
     internal class TelePrompterConfig
