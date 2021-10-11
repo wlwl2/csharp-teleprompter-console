@@ -28,8 +28,8 @@ namespace TeleprompterConsole {
         }
 
         private static async Task ShowTeleprompter (TelePrompterConfig config) {
-            var words = ReadFrom("sampleQuotes.txt");
-            foreach (var line in words) {
+            IEnumerable<string> words = ReadFrom("sampleQuotes.txt");
+            foreach (string line in words) {
                 // Console.Write(config.DelayInMilliseconds);
                 Console.Write(line);
                 if (!string.IsNullOrWhiteSpace(line)) {
@@ -44,9 +44,9 @@ namespace TeleprompterConsole {
         static IEnumerable<string> ReadFrom (string file) {
             string line;
             // The File class is defined in the System.IO namespace.
-            using (var reader = File.OpenText(file)) {
+            using (StreamReader reader = File.OpenText(file)) {
                 while ((line = reader.ReadLine()) != null) {
-                    var words = line.Split(' ');
+                    string[] words = line.Split(' ');
 
                     var lineLength = 0;
                     // return single words instead of entire lines
