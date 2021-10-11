@@ -47,7 +47,6 @@ namespace TeleprompterConsole {
             using (StreamReader reader = File.OpenText(file)) {
                 while ((line = reader.ReadLine()) != null) {
                     string[] words = line.Split(' ');
-
                     int lineLength = 0;
                     // return single words instead of entire lines
                     foreach (string word in words) {
@@ -69,21 +68,21 @@ namespace TeleprompterConsole {
         private static async Task GetInput (TelePrompterConfig config) {
             Action work = () => {
                 do {
-                    var key = Console.ReadKey(true);
-                    if (key.KeyChar == '>')
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    if (key.KeyChar == '>') {
                         config.UpdateDelay(-10);
-                    else if (key.KeyChar == '<')
+                    } else if (key.KeyChar == '<') {
                         config.UpdateDelay(10);
+                    }
                 } while (!config.Done);
             };
             await Task.Run(work);
         }
 
         private static async Task RunTeleprompter () {
-            var config = new TelePrompterConfig();
-            var displayTask = ShowTeleprompter(config);
-
-            var speedTask = GetInput(config);
+            TelePrompterConfig config = new TelePrompterConfig();
+            Task displayTask = ShowTeleprompter(config);
+            Task speedTask = GetInput(config);
             await Task.WhenAny(displayTask, speedTask);
         }
     }
