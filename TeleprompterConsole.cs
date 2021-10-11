@@ -3,15 +3,13 @@
 using static System.Math;
 
 // C# uses namespaces to organize types
-namespace TeleprompterConsole
-{
-    internal class TelePrompterConfig
-    {
+namespace TeleprompterConsole {
+    internal class TelePrompterConfig {
         private object lockHandle = new object();
         public int DelayInMilliseconds { get; private set; } = 200;
 
-        public void UpdateDelay(int increment) // negative to speed up
-        {
+        // negative to speed up
+        public void UpdateDelay (int increment) {
             var newDelay = Min(DelayInMilliseconds + increment, 1000);
             newDelay = Max(newDelay, 20);
 
@@ -20,16 +18,14 @@ namespace TeleprompterConsole
             // must wait for the first thread to exit that section. The lock
             // statement uses an object that guards the lock section. This class
             // follows a standard idiom to lock a private object in the class.
-            lock (lockHandle)
-            {
+            lock (lockHandle) {
                 DelayInMilliseconds = newDelay;
             }
         }
 
         public bool Done { get; private set; }
 
-        public void SetDone()
-        {
+        public void SetDone () {
             Done = true;
         }
     }
