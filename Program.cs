@@ -10,17 +10,15 @@ namespace TeleprompterConsole {
         // If you use C# 7.1 or later, you can create console applications
         // with async Main method.
         static void Main (string[] args) {
-            // var lines = ReadFrom("sampleQuotes.txt");
-            // foreach (var line in lines)
-            // {
+            // IEnumerable<string> lines = ReadFrom("sampleQuotes.txt");
+            // foreach (string line in lines) {
             //     Console.Write(line);
-            //     if (!string.IsNullOrWhiteSpace(line))
-            //     {
-            //         var pause = Task.Delay(200);
-            //         // Synchronously waiting on a task is an
-            //         // anti-pattern. This will get fixed in later
-            //         // steps.
-            //         pause.Wait();
+            //     if (!string.IsNullOrWhiteSpace(line)) {
+            //          Task pause = Task.Delay(200);
+            //          // Synchronously waiting on a task is an
+            //          // anti-pattern. This will get fixed in later
+            //          // steps.
+            //          pause.Wait();
             //     }
             // }
             RunTeleprompter().Wait();
