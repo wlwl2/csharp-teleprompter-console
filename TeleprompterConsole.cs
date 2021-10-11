@@ -8,7 +8,7 @@ namespace TeleprompterConsole {
         private object lockHandle = new object();
         public int DelayInMilliseconds { get; private set; } = 200;
 
-        // negative to speed up
+        // negative increment to speed up
         public void UpdateDelay (int increment) {
             var newDelay = Min(DelayInMilliseconds + increment, 1000);
             newDelay = Max(newDelay, 20);
