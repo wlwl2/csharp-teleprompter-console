@@ -24,7 +24,7 @@ https://docs.microsoft.com/en-us/dotnet/csharp/tutorials/console-teleprompter
 1. `dotnet new console`
 2. `dotnet restore`
 
-## Program.cs
+## 1. Program.cs
 
 ```csharp
 using System;
@@ -39,8 +39,8 @@ namespace TeleprompterConsole {
         }
 
         private static async Task ShowTeleprompter (TelePrompterConfig config) {
-            var words = ReadFrom("sampleQuotes.txt");
-            foreach (var line in words) {
+            IEnumerable<string> words = ReadFrom("sampleQuotes.txt");
+            foreach (string line in words) {
                 Console.Write(line);
                 if (!string.IsNullOrWhiteSpace(line)) {
                     await Task.Delay(config.DelayInMilliseconds);
@@ -51,11 +51,11 @@ namespace TeleprompterConsole {
 
         static IEnumerable<string> ReadFrom (string file) {
             string line;
-            using (var reader = File.OpenText(file)) {
+            using (StreamReader reader = File.OpenText(file)) {
                 while ((line = reader.ReadLine()) != null) {
-                    var words = line.Split(' ');
-                    var lineLength = 0;
-                    foreach (var word in words) {
+                    string[] words = line.Split(' ');
+                    int lineLength = 0;
+                    foreach (string word in words) {
                         yield return word + " ";
                         lineLength += word.Length + 1;
                         if (lineLength > 70) {
@@ -71,22 +71,46 @@ namespace TeleprompterConsole {
         private static async Task GetInput (TelePrompterConfig config) {
             Action work = () => {
                 do {
-                    var key = Console.ReadKey(true);
-                    if (key.KeyChar == '>')
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    if (key.KeyChar == '>') {
                         config.UpdateDelay(-10);
-                    else if (key.KeyChar == '<')
+                    } else if (key.KeyChar == '<') {
                         config.UpdateDelay(10);
+                    }
                 } while (!config.Done);
             };
             await Task.Run(work);
         }
 
         private static async Task RunTeleprompter () {
-            var config = new TelePrompterConfig();
-            var displayTask = ShowTeleprompter(config);
-
-            var speedTask = GetInput(config);
+            TelePrompterConfig config = new TelePrompterConfig();
+            Task displayTask = ShowTeleprompter(config);
+            Task speedTask = GetInput(config);
             await Task.WhenAny(displayTask, speedTask);
+        }
+    }
+}
+```
+
+## 2. TeleprompterConsole.cs
+
+```csharp
+using static System.Math;
+
+namespace TeleprompterConsole {
+    internal class TelePrompterConfig {
+        private object lockHandle = new object();
+        public int DelayInMilliseconds { get; private set; } = 200;
+        public void UpdateDelay (int increment) {
+            int newDelay = Min(DelayInMilliseconds + increment, 1000);
+            newDelay = Max(newDelay, 20);
+            lock (lockHandle) {
+                DelayInMilliseconds = newDelay;
+            }
+        }
+        public bool Done { get; private set; }
+        public void SetDone () {
+            Done = true;
         }
     }
 }
