@@ -24,7 +24,6 @@ namespace TeleprompterConsole {
             //     }
             // }
             RunTeleprompter().Wait();
-
         }
 
         private static async Task ShowTeleprompter (TelePrompterConfig config) {
