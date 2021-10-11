@@ -10,7 +10,7 @@ namespace TeleprompterConsole {
 
         // negative increment to speed up
         public void UpdateDelay (int increment) {
-            var newDelay = Min(DelayInMilliseconds + increment, 1000);
+            int newDelay = Min(DelayInMilliseconds + increment, 1000);
             newDelay = Max(newDelay, 20);
 
             // Ensures that only a single thread can be in that code at any
